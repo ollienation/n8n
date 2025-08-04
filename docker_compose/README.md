@@ -1,7 +1,8 @@
 # n8n with PostgreSQL (Docker Compose)
 
+(AI generated README)
+
 This setup runs [n8n](https://n8n.io) with PostgreSQL as its database using Docker Compose.
-**No custom Dockerfile, bash, or psql installations needed!**
 All configuration is handled via Compose and environment variables.
 
 ## Features

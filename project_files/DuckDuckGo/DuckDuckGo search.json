@@ -1,0 +1,368 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        -80
+      ],
+      "id": "37d6b8f1-2456-47a3-a8dd-7af4d221299b",
+      "name": "When chat message received",
+      "webhookId": "52ca9159-98a4-4881-9f37-9aae30724a04"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "chat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "12fdab06-f6c0-4fef-901b-6659c165f7b6"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5b86ec2e-4bc7-4240-a755-521c222b9dc5",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "web",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0477cfeb-6a0f-42a1-8ff7-09d3d348ae18",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "docs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        128,
+        -96
+      ],
+      "id": "bb2a068d-3e1d-4df2-9290-287cf377c2a9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You're a 80 year old butler that has been serving the king for 60 years. Your answers awnsers are clean and polished, and you always address the user as sir or madam. You are very knowledgeable about the world and have a vast amount of experience. You are always polite and respectful, and you never use slang or informal language.",
+              "role": "system"
+            },
+            {
+              "content": "=User input: {{ $('When chat message received').item.json.chatInput }} search data: {{ $json.compiledResults }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        976,
+        -80
+      ],
+      "id": "c5c4dc43-6817-43a4-b20a-30dfebb59fa5",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0aKyNGtJREWSlRVG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Analyze the user question and respond with exactly one word:\n- \"web\" if the question needs current/live information from the internet\n- \"docs\" if the question is about specific documentation or internal knowledge\n- \"chat\" if it's a general conversation that doesn't need external data\n\nOnly respond with: web, docs, or chat",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.chatInput }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -208,
+        -80
+      ],
+      "id": "4581eadf-e799-4b8a-8ca5-cc271177b9f9",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "0aKyNGtJREWSlRVG",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "locale": "nl-nl",
+        "query": "={{ $('When chat message received').item.json.chatInput }}",
+        "webSearchOptions": {
+          "maxResults": 10,
+          "region": "wt-wt",
+          "safeSearch": -2,
+          "timePeriod": "y"
+        },
+        "cacheSettings": {
+          "enableCache": true,
+          "cacheTTL": 300
+        },
+        "proxySettings": {},
+        "searchFilters": {}
+      },
+      "type": "n8n-nodes-duckduckgo-search.duckDuckGo",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -80
+      ],
+      "id": "9a18b997-9003-4ff3-ae56-f04c294f4d34",
+      "name": "DuckDuckGo",
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bbfe8dc9-3e38-4458-a8de-11698b12adc5",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        -240
+      ],
+      "id": "95493072-fd70-4e0a-95b5-3c0549db8093",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "title"
+            },
+            {
+              "fieldToAggregate": "snippet"
+            },
+            {
+              "fieldToAggregate": "url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -80
+      ],
+      "id": "6d0dabb2-c98a-4f66-a219-803ec1dbc8de",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { title, snippet, url } = items[0].json;\n\n// Exclude first two entries (ads)\nconst startIdx = 2;\n\nlet compiled = '';\nfor (let i = startIdx; i < title.length; i++) {\n  compiled += `${i - startIdx + 1}. ${title[i]}\\n${snippet[i]}\\n${url[i]}\\n\\n`;\n}\n\nreturn [\n  {\n    json: {\n      compiledResults: compiled.trim()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -80
+      ],
+      "id": "3ed17ac5-f29b-4ad9-b6de-4307a67d78a8",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        []
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DuckDuckGo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DuckDuckGo": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "336785c0-1825-46a6-9b6c-aed06150f7f2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3d7023c1c358b320e156e333b199b97ff0e6584f975f0230cc2308798a7f885b"
+  },
+  "id": "fmVtNqqC5aWjdYlO",
+  "tags": []
+}
